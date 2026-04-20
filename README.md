@@ -1,6 +1,5 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/sarabala1979/Torii/main/docs/assets/torii-banner.png" alt="Torii" width="100%" />
 
 # ⛩️ Torii
 
