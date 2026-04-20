@@ -1,0 +1,72 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "torii"
+version = "0.1.0"
+description = "The MCP gateway that turns any API into a tool — and unifies all your MCP servers into one"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "sarabala1979" }]
+keywords = ["mcp", "ai", "api", "gateway", "llm", "tools", "model-context-protocol"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Internet :: WWW/HTTP",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=1.0.0",                  # MCP Python SDK
+    "httpx>=0.27.0",               # Async HTTP client (API calls)
+    "pyyaml>=6.0",                 # YAML config parsing
+    "pydantic>=2.0",               # Config validation & models
+    "typer>=0.12.0",               # CLI framework
+    "uvicorn>=0.30.0",             # ASGI server
+    "fastapi>=0.111.0",            # HTTP server for MCP endpoint
+    "rich>=13.0.0",                # Beautiful terminal output
+    "python-dotenv>=1.0.0",        # .env file support
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=5.0",
+    "httpx>=0.27.0",               # async test client
+    "ruff>=0.4.0",                 # linter + formatter
+    "mypy>=1.10.0",                # type checker
+]
+
+[project.scripts]
+torii = "torii.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/sarabala1979/Torii"
+Repository = "https://github.com/sarabala1979/Torii"
+Issues = "https://github.com/sarabala1979/Torii/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["torii"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "--cov=torii --cov-report=term-missing"

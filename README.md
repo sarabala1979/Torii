@@ -2,97 +2,88 @@
 
 > **The MCP gateway that turns any API into a tool — and unifies all your MCP servers into one.**
 
+[![CI](https://github.com/sarabala1979/Torii/actions/workflows/ci.yml/badge.svg)](https://github.com/sarabala1979/Torii/actions)
+[![PyPI](https://img.shields.io/pypi/v/torii)](https://pypi.org/project/torii/)
+[![Python](https://img.shields.io/pypi/pyversions/torii)](https://pypi.org/project/torii/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Report Card](https://goreportcard.com/badge/github.com/sarabala1979/Torii)](https://goreportcard.com/report/github.com/sarabala1979/Torii)
-[![GitHub Stars](https://img.shields.io/github/stars/sarabala1979/Torii?style=social)](https://github.com/sarabala1979/Torii/stargazers)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/sarabala1979/Torii/pulls)
 
 ---
 
 ## What is Torii?
 
-**Torii** (鳥居) is a sacred gateway in Japanese architecture — a passage through which everything must flow. Just as a torii gate marks the threshold between the ordinary world and something greater, **Torii the project** is the gateway between your APIs, MCP servers, and AI assistants.
+**Torii** (鳥居) is a sacred gateway in Japanese architecture — everything passes *through* it. Just as a torii gate marks the threshold into something greater, **Torii the project** is the gateway between your APIs, MCP servers, and AI assistants.
 
-Torii is an open-source **MCP (Model Context Protocol) gateway** that solves three critical problems:
+Torii is an open-source **MCP (Model Context Protocol) gateway** written in Python that solves three core problems:
 
 | Problem | Torii's Solution |
 |---|---|
-| "My REST APIs aren't accessible to AI tools" | **Dynamic API → MCP conversion**: Point Torii at any API, get instant MCP tools |
-| "I have too many MCP servers to manage" | **MCP aggregation**: Merge multiple MCP servers into a single unified endpoint |
-| "I need to orchestrate complex tool workflows" | **Workflow configuration**: Chain tools together with declarative config |
+| "My REST APIs aren't accessible to AI tools" | **Dynamic API → MCP conversion** — point Torii at any endpoint, get instant MCP tools |
+| "I have too many MCP servers to manage" | **MCP aggregation** — merge multiple servers into a single unified endpoint |
+| "I need to orchestrate multi-step AI workflows" | **Workflow engine** — chain tools together with declarative config |
 
 ---
 
 ## ✨ Features
 
-- **🔄 Dynamic API → MCP Conversion** — Point Torii at any REST/HTTP endpoint and it instantly becomes an MCP tool, no code required
-- **🔗 MCP Aggregation** — Connect multiple MCP servers and expose them as a single unified MCP endpoint
-- **⚙️ Workflow Configuration** — Define complex multi-step tool chains with a simple config file
-- **🚀 Zero Code Required** — Everything configurable via `torii.config.yaml`
-- **🔌 Hot Reload** — Add or remove APIs and MCP servers without restarting
-- **🔒 Auth Support** — Forward authentication headers to upstream APIs automatically
-- **📊 Observability** — Built-in logging, tracing, and health checks
+- **🔄 Dynamic API → MCP Conversion** — any REST endpoint becomes an MCP tool, zero code required
+- **🔗 MCP Aggregation** — connect multiple MCP servers (HTTP or stdio) through one gateway
+- **⚙️ Workflow Engine** — chain tools with `{{step.output}}` template variables
+- **🔒 Auth Support** — bearer, API key, basic auth — forwarded automatically
+- **🌍 Env Var Expansion** — use `${MY_SECRET}` in config, never hardcode credentials
+- **🚀 Zero Code** — everything driven by `torii.config.yaml`
+- **📊 Rich CLI** — beautiful terminal output with `torii serve`, `validate`, `tools list`
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│           AI Assistant / MCP Client          │
-│        (Claude, Cursor, Windsurf, etc.)      │
-└───────────────────┬─────────────────────────┘
-                    │  MCP Protocol
-                    ▼
-┌─────────────────────────────────────────────┐
-│                ⛩️  TORII                      │
-│                                             │
-│  ┌─────────────┐    ┌────────────────────┐  │
-│  │  API → MCP  │    │  MCP Aggregator    │  │
-│  │  Converter  │    │  (Multi-server hub) │  │
-│  └──────┬──────┘    └────────┬───────────┘  │
-│         │                    │              │
-│  ┌──────▼────────────────────▼───────────┐  │
-│  │         Workflow Engine               │  │
-│  │    (Chain tools, configure flows)     │  │
-│  └───────────────────────────────────────┘  │
-└────────────┬────────────────┬───────────────┘
-             │                │
-    ┌────────▼──────┐  ┌──────▼──────────────┐
-    │  Your REST    │  │  Other MCP Servers   │
-    │  APIs         │  │  (GitHub, Slack, etc)│
-    └───────────────┘  └─────────────────────┘
+┌──────────────────────────────────────────────┐
+│          AI Assistant / MCP Client           │
+│       (Claude, Cursor, Windsurf, etc.)       │
+└──────────────────┬───────────────────────────┘
+                   │  MCP Protocol
+                   ▼
+┌──────────────────────────────────────────────┐
+│               ⛩️  TORII                       │
+│                                              │
+│  ┌─────────────┐    ┌─────────────────────┐  │
+│  │  API → MCP  │    │   MCP Aggregator    │  │
+│  │  Converter  │    │  (multi-server hub) │  │
+│  └──────┬──────┘    └──────────┬──────────┘  │
+│         │                      │             │
+│  ┌──────▼──────────────────────▼──────────┐  │
+│  │           Workflow Engine              │  │
+│  │   (chain tools, template variables)   │  │
+│  └────────────────────────────────────────┘  │
+└────────────┬──────────────────┬──────────────┘
+             │                  │
+   ┌──────────▼──────┐  ┌───────▼─────────────┐
+   │  Your REST APIs │  │  Upstream MCP Servers│
+   │  (any endpoint) │  │  (GitHub, Slack, ...) │
+   └─────────────────┘  └─────────────────────┘
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### Installation
+### Install
 
 ```bash
-# Using Go
-go install github.com/sarabala1979/Torii@latest
-
-# Using Docker
-docker pull ghcr.io/sarabala1979/torii:latest
-
-# Using Homebrew (macOS)
-brew install sarabala1979/tap/torii
+pip install torii
 ```
 
-### Basic Usage
-
-**1. Create a config file** (`torii.config.yaml`):
+### Create a config
 
 ```yaml
+# torii.config.yaml
 server:
   port: 8080
-  name: "My Torii Gateway"
 
-# Convert REST APIs to MCP tools
 apis:
-  - name: "weather-api"
+  - name: "weather"
     base_url: "https://api.openweathermap.org/data/2.5"
     auth:
       type: "api_key"
@@ -105,39 +96,52 @@ apis:
         description: "Get current weather for a city"
         parameters:
           - name: "q"
+            in: query
             description: "City name"
             required: true
+            type: string
 
-# Aggregate other MCP servers
 mcp_servers:
   - name: "github"
     url: "https://api.githubcopilot.com/mcp/"
     auth:
       type: "bearer"
       token: "${GITHUB_TOKEN}"
-  - name: "slack"
-    command: "npx @slack/mcp-server"
+    namespace: "gh"
 
-# Define workflows
 workflows:
   - name: "daily-standup"
-    description: "Fetch GitHub PRs and post to Slack"
+    description: "Fetch open PRs and post to Slack"
     steps:
-      - tool: "github.list_pull_requests"
-        output: "prs"
-      - tool: "slack.post_message"
+      - id: "fetch_prs"
+        tool: "gh.list_pull_requests"
+        input:
+          state: "open"
+      - id: "notify"
+        tool: "slack.post_message"
         input:
           channel: "#standup"
-          message: "Today's PRs: {{prs}}"
+          message: "Open PRs: {{fetch_prs.output}}"
 ```
 
-**2. Start Torii:**
+### Start the gateway
 
 ```bash
-torii serve --config torii.config.yaml
+WEATHER_API_KEY=your_key GITHUB_TOKEN=your_token torii serve
 ```
 
-**3. Connect your AI assistant:**
+```
+⛩️  Torii — My Torii Gateway
+   Config:    torii.config.yaml
+   Endpoint:  http://0.0.0.0:8080/mcp
+   APIs:      1
+   MCP Servers: 1
+   Workflows: 1
+
+✓ Gateway ready — listening for MCP connections
+```
+
+### Connect to Claude Desktop
 
 ```json
 {
@@ -148,8 +152,6 @@ torii serve --config torii.config.yaml
   }
 }
 ```
-
-That's it — all your APIs and MCP servers are now accessible through a single gateway. ⛩️
 
 ---
 
@@ -161,156 +163,102 @@ That's it — all your APIs and MCP servers are now accessible through a single 
 apis:
   - name: "my-api"
     base_url: "https://api.example.com/v1"
-    
-    # Authentication options
     auth:
-      type: "api_key" | "bearer" | "basic" | "oauth2" | "none"
-      header: "Authorization"         # for api_key/bearer
-      value: "${MY_API_KEY}"          # supports env vars
-    
-    # Headers forwarded to all endpoints
+      type: "bearer"          # bearer | api_key | basic | none
+      token: "${API_TOKEN}"
     headers:
-      Content-Type: "application/json"
       X-Client: "torii"
-    
     endpoints:
       - path: "/users/{id}"
-        method: GET
-        tool_name: "get_user"
+        method: GET           # GET | POST | PUT | PATCH | DELETE
+        tool_name: "get_user" # snake_case, exposed as MCP tool name
         description: "Fetch a user by ID"
         parameters:
           - name: "id"
-            in: "path"           # path | query | body
-            description: "User ID"
+            in: path          # path | query | body
             required: true
-            type: "string"
+            type: string
 ```
 
 ### MCP Aggregation
 
 ```yaml
 mcp_servers:
-  # Remote MCP server (HTTP)
-  - name: "remote-server"
-    url: "https://mcp.example.com/mcp"
-    auth:
-      type: "bearer"
-      token: "${MCP_TOKEN}"
-  
-  # Local MCP server (stdio)
-  - name: "local-server"
-    command: "npx my-mcp-server"
-    args: ["--port", "3000"]
-    env:
-      API_KEY: "${MY_KEY}"
-  
-  # Tool namespace (avoid collisions)
+  # Remote HTTP server
   - name: "github"
     url: "https://api.githubcopilot.com/mcp/"
-    namespace: "gh"    # tools become gh.list_repos, gh.create_issue, etc.
+    auth:
+      type: bearer
+      token: "${GITHUB_TOKEN}"
+    namespace: "gh"           # tools become gh.list_repos, etc.
+
+  # Local stdio server
+  - name: "filesystem"
+    command: "npx"
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+    namespace: "fs"
 ```
 
 ### Workflow Engine
 
 ```yaml
 workflows:
-  - name: "create-github-issue-from-slack"
-    trigger: "on_tool_call"        # manual | on_tool_call | scheduled
+  - name: "create-and-notify"
+    description: "Create a GitHub issue then post to Slack"
     steps:
-      - id: "parse"
-        tool: "extract_issue_details"
-        input:
-          text: "{{trigger.input}}"
-        
       - id: "create"
-        tool: "github.create_issue"
+        tool: "gh.create_issue"
         input:
-          title: "{{parse.output.title}}"
-          body: "{{parse.output.body}}"
-          labels: ["{{parse.output.priority}}"]
-        
+          title: "{{input.title}}"
+          body: "{{input.body}}"
+
       - id: "notify"
         tool: "slack.post_message"
         input:
           channel: "#engineering"
-          message: "Issue created: {{create.output.html_url}}"
+          message: "Issue created: {{create.output}}"
 ```
+
+Templates support `{{step_id.output}}` and `{{input.field}}` syntax.
 
 ---
 
-## 🔌 Connecting to AI Assistants
+## 🔌 Connecting AI Assistants
 
 ### Claude Desktop
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+`~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "torii": {
-      "url": "http://localhost:8080/mcp"
-    }
+    "torii": { "url": "http://localhost:8080/mcp" }
   }
 }
 ```
 
 ### Cursor
 
-Add to `.cursor/mcp.json`:
+`.cursor/mcp.json`:
 
 ```json
 {
   "mcpServers": {
-    "torii": {
-      "url": "http://localhost:8080/mcp"
-    }
+    "torii": { "url": "http://localhost:8080/mcp" }
   }
 }
 ```
 
 ### VS Code (Copilot)
 
-Add to `.vscode/settings.json`:
+`.vscode/settings.json`:
 
 ```json
 {
   "mcp.servers": {
-    "torii": {
-      "type": "http",
-      "url": "http://localhost:8080/mcp"
-    }
+    "torii": { "type": "http", "url": "http://localhost:8080/mcp" }
   }
 }
-```
-
----
-
-## 🐳 Docker
-
-```bash
-# Run with Docker
-docker run -p 8080:8080 \
-  -v $(pwd)/torii.config.yaml:/config/torii.config.yaml \
-  -e GITHUB_TOKEN=your_token \
-  ghcr.io/sarabala1979/torii:latest
-
-# Docker Compose
-```
-
-```yaml
-# docker-compose.yml
-version: "3.8"
-services:
-  torii:
-    image: ghcr.io/sarabala1979/torii:latest
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./torii.config.yaml:/config/torii.config.yaml
-    environment:
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - SLACK_TOKEN=${SLACK_TOKEN}
-    restart: unless-stopped
 ```
 
 ---
@@ -319,96 +267,84 @@ services:
 
 ```bash
 # Start the gateway
-torii serve [--config path/to/config.yaml] [--port 8080]
+torii serve [--config torii.config.yaml] [--port 8080]
 
-# Validate your config
-torii validate --config torii.config.yaml
+# Validate config without starting
+torii validate [--config torii.config.yaml]
 
-# List all registered tools
-torii tools list
+# List all tools that will be exposed
+torii tools list [--config torii.config.yaml]
 
-# Test a specific tool
-torii tools invoke get_current_weather --params '{"q": "San Francisco"}'
-
-# Import an OpenAPI spec and auto-generate config
-torii import openapi --spec api.yaml --output torii.config.yaml
-
-# Check gateway health
-torii health
+# Show version
+torii version
 ```
 
 ---
 
-## 📦 Use Cases
+## 🐳 Docker
 
-**For Developers**
-- Instantly expose any internal REST API to Claude, Cursor, or Copilot
-- Replace complex multi-server MCP setups with a single gateway
-- Build multi-step AI workflows without writing glue code
+```bash
+docker run -p 8080:8080 \
+  -v $(pwd)/torii.config.yaml:/app/torii.config.yaml \
+  -e GITHUB_TOKEN=your_token \
+  ghcr.io/sarabala1979/torii:latest
+```
 
-**For Teams**
-- Standardize AI tool access across your organization
-- Add auth, rate limiting, and observability to all AI tool calls
-- One config file, one endpoint — easy to share and version-control
-
-**For Enterprises**
-- Centralized control plane for all MCP access
-- Audit trail for every AI tool invocation
-- Fine-grained access control per team or service
+```yaml
+# docker-compose.yml
+services:
+  torii:
+    image: ghcr.io/sarabala1979/torii:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./torii.config.yaml:/app/torii.config.yaml
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    restart: unless-stopped
+```
 
 ---
 
 ## 🗺️ Roadmap
 
 - [x] Dynamic API → MCP conversion
-- [x] Multi-MCP aggregation
-- [x] Workflow configuration engine
-- [ ] Web UI for managing tools and workflows
-- [ ] OpenAPI / Swagger auto-import
+- [x] Multi-MCP server aggregation
+- [x] Workflow engine with template variables
+- [x] Bearer / API key / basic auth support
+- [x] Env var expansion in config
+- [ ] OpenAPI / Swagger spec auto-import
+- [ ] Web UI dashboard
 - [ ] GraphQL support
-- [ ] gRPC support
-- [ ] Tool-level rate limiting
+- [ ] Tool-level rate limiting & caching
 - [ ] Audit logging
-- [ ] Torii Cloud (hosted gateway)
+- [ ] Docker image on GHCR
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions of all kinds! Please read our [Contributing Guide](CONTRIBUTING.md) to get started.
+We welcome all contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
 
 ```bash
-# Clone the repo
 git clone https://github.com/sarabala1979/Torii.git
 cd Torii
-
-# Install dependencies
-go mod download
-
-# Run tests
-go test ./...
-
-# Start in development mode
-go run main.go serve --config examples/torii.config.yaml
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+pytest tests/unit/ -v
 ```
 
 ---
 
 ## 📄 License
 
-Torii is open-source software licensed under the [MIT License](LICENSE).
-
----
-
-## 🙏 Acknowledgements
-
-Named after the iconic **torii gate** (鳥居) of Japanese Shinto shrines — a sacred threshold between worlds. Just as the torii marks the passage into a sacred space, this project marks the gateway between your tools and AI.
+MIT — see [LICENSE](LICENSE).
 
 ---
 
 <div align="center">
 
-⛩️ **[Documentation](https://torii.dev)** · **[Changelog](CHANGELOG.md)** · **[Issues](https://github.com/sarabala1979/Torii/issues)** · **[Discussions](https://github.com/sarabala1979/Torii/discussions)**
+⛩️ **[Docs](docs/getting-started.md)** · **[Examples](examples/)** · **[Issues](https://github.com/sarabala1979/Torii/issues)** · **[Discussions](https://github.com/sarabala1979/Torii/discussions)**
 
 *Configure once. Connect everything.*
 

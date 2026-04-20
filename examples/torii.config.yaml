@@ -1,0 +1,165 @@
+# ⛩️ torii.config.yaml — Full Example
+# This file demonstrates all Torii features.
+# Copy this file, remove what you don't need, and customize.
+
+server:
+  port: 8080
+  name: "My Torii Gateway"
+  # Optional: enable TLS
+  # tls:
+  #   cert: /path/to/cert.pem
+  #   key: /path/to/key.pem
+
+# ─────────────────────────────────────────────
+# 1. API → MCP Conversion
+#    Turn any REST endpoint into an MCP tool
+# ─────────────────────────────────────────────
+apis:
+  # Example: OpenWeatherMap
+  - name: "weather-api"
+    base_url: "https://api.openweathermap.org/data/2.5"
+    auth:
+      type: "api_key"
+      header: "X-API-Key"
+      value: "${WEATHER_API_KEY}"   # reads from env var
+    endpoints:
+      - path: "/weather"
+        method: GET
+        tool_name: "get_current_weather"
+        description: "Get current weather conditions for a city"
+        parameters:
+          - name: "q"
+            in: "query"
+            description: "City name (e.g. 'San Francisco')"
+            required: true
+            type: "string"
+          - name: "units"
+            in: "query"
+            description: "Units: metric | imperial | standard"
+            required: false
+            type: "string"
+            default: "metric"
+
+      - path: "/forecast"
+        method: GET
+        tool_name: "get_weather_forecast"
+        description: "Get 5-day weather forecast for a city"
+        parameters:
+          - name: "q"
+            in: "query"
+            description: "City name"
+            required: true
+            type: "string"
+
+  # Example: Internal company API with Bearer auth
+  - name: "internal-api"
+    base_url: "https://api.internal.company.com/v1"
+    auth:
+      type: "bearer"
+      token: "${INTERNAL_API_TOKEN}"
+    headers:
+      X-Client: "torii"
+      Accept: "application/json"
+    endpoints:
+      - path: "/users/{id}"
+        method: GET
+        tool_name: "get_user"
+        description: "Fetch a user by their ID"
+        parameters:
+          - name: "id"
+            in: "path"
+            description: "User ID"
+            required: true
+            type: "string"
+
+      - path: "/users"
+        method: POST
+        tool_name: "create_user"
+        description: "Create a new user"
+        parameters:
+          - name: "name"
+            in: "body"
+            description: "Full name"
+            required: true
+            type: "string"
+          - name: "email"
+            in: "body"
+            description: "Email address"
+            required: true
+            type: "string"
+
+      - path: "/users/{id}"
+        method: DELETE
+        tool_name: "delete_user"
+        description: "Delete a user by ID"
+        parameters:
+          - name: "id"
+            in: "path"
+            description: "User ID"
+            required: true
+            type: "string"
+
+# ─────────────────────────────────────────────
+# 2. MCP Aggregation
+#    Merge multiple MCP servers into one gateway
+# ─────────────────────────────────────────────
+mcp_servers:
+  # Remote MCP server over HTTP
+  - name: "github"
+    url: "https://api.githubcopilot.com/mcp/"
+    auth:
+      type: "bearer"
+      token: "${GITHUB_TOKEN}"
+    namespace: "gh"   # tools become gh.list_repos, gh.create_issue, etc.
+
+  # Local MCP server via stdio (npx)
+  - name: "slack"
+    command: "npx"
+    args: ["-y", "@slack/mcp-server"]
+    env:
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+    namespace: "slack"
+
+  # Another local server
+  - name: "filesystem"
+    command: "npx"
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]
+    namespace: "fs"
+
+# ─────────────────────────────────────────────
+# 3. Workflow Configuration
+#    Chain tools together into reusable flows
+# ─────────────────────────────────────────────
+workflows:
+  # Post daily GitHub PR summary to Slack
+  - name: "daily-standup"
+    description: "Fetch open PRs from GitHub and post a summary to Slack"
+    steps:
+      - id: "fetch_prs"
+        tool: "gh.list_pull_requests"
+        input:
+          state: "open"
+          sort: "updated"
+
+      - id: "post_summary"
+        tool: "slack.post_message"
+        input:
+          channel: "#standup"
+          message: "📋 Open PRs today: {{fetch_prs.output.total_count}} — {{fetch_prs.output.items[0].html_url}}"
+
+  # Create GitHub issue from a description and notify Slack
+  - name: "create-issue-and-notify"
+    description: "Create a GitHub issue and post a Slack notification"
+    steps:
+      - id: "create"
+        tool: "gh.create_issue"
+        input:
+          title: "{{input.title}}"
+          body: "{{input.body}}"
+          labels: ["{{input.priority}}"]
+
+      - id: "notify"
+        tool: "slack.post_message"
+        input:
+          channel: "#engineering"
+          message: "🐛 New issue created: <{{create.output.html_url}}|{{input.title}}>"
